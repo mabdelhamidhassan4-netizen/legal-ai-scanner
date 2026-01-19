@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, FileText, AlertTriangle, CheckCircle2, Info } from "lucide-react";
+import LanguageToggle from "@/components/LanguageToggle";
 
 const ResultsEn = () => {
   const location = useLocation();
@@ -24,6 +25,7 @@ const ResultsEn = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8" dir="ltr">
+      <LanguageToggle />
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
