@@ -1,157 +1,157 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, FileText, AlertTriangle, CheckCircle2, Info } from "lucide-react";
+import { ArrowLeft, FileText, AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import LanguageToggle from "@/components/LanguageToggle";
 
-const Results = () => {
+const ResultsEn = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { formData, fileName } = location.state || {};
 
   if (!formData) {
-    navigate("/");
+    navigate("/en");
     return null;
   }
 
-  const getDocumentTypeArabic = (type: string) => {
+  const getDocumentTypeLabel = (type: string) => {
     const types: Record<string, string> = {
-      contract: "عقد",
-      document: "مستند",
-      cheque: "شيك",
+      contract: "Contract",
+      document: "Document",
+      cheque: "Cheque",
     };
     return types[type] || type;
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8" dir="rtl">
+    <div className="min-h-screen bg-background p-4 md:p-8" dir="ltr">
       <LanguageToggle />
       <div className="max-w-5xl mx-auto">
-        {/* الترويسة */}
+        {/* Header */}
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/en")}
             className="mb-4 hover:bg-secondary"
           >
-            <ArrowRight className="ml-2 h-4 w-4" />
-            العودة إلى صفحة المسح الضوئي
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Scan Page
           </Button>
           <div className="text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">
-              نتائج التحليل
+              Analysis Results
             </h1>
             <p className="text-muted-foreground">
-              المستند: <span className="font-medium text-foreground">{fileName}</span>
+              Document: <span className="font-medium text-foreground">{fileName}</span>
             </p>
           </div>
         </div>
 
-        {/* شبكة النتائج */}
+        {/* Results Grid */}
         <div className="space-y-6">
-          {/* ملخص الوثيقة */}
+          {/* Document Summary */}
           <Card className="border-2">
             <CardHeader className="bg-muted/30">
               <CardTitle className="flex items-center gap-2">
                 <Info className="h-5 w-5 text-primary" />
-                ملخص الوثيقة
+                Document Summary
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-muted-foreground">الاسم</p>
+                  <p className="text-sm font-semibold text-muted-foreground">Name</p>
                   <p className="text-base">{formData.fullName}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-muted-foreground">البريد الإلكتروني</p>
-                  <p className="text-base" dir="ltr">{formData.email}</p>
+                  <p className="text-sm font-semibold text-muted-foreground">Email</p>
+                  <p className="text-base">{formData.email}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-muted-foreground">نوع المستند</p>
-                  <p className="text-base">{getDocumentTypeArabic(formData.documentType)}</p>
+                  <p className="text-sm font-semibold text-muted-foreground">Document Type</p>
+                  <p className="text-base">{getDocumentTypeLabel(formData.documentType)}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-muted-foreground">تاريخ التحليل</p>
-                  <p className="text-base">{new Date().toLocaleDateString("ar-SA")}</p>
+                  <p className="text-sm font-semibold text-muted-foreground">Analysis Date</p>
+                  <p className="text-base">{new Date().toLocaleDateString("en-US")}</p>
                 </div>
               </div>
               <div className="mt-4 p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                  📌 تكامل API: سيعرض هذا القسم البيانات الوصفية المستخرجة من محرك الذكاء الاصطناعي
+                  📌 API Integration: This section will display extracted metadata from the AI engine
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* النص المستخرج */}
+          {/* Extracted Text */}
           <Card className="border-2">
             <CardHeader className="bg-muted/30">
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-primary" />
-                النص المستخرج (معاينة)
+                Extracted Text (Preview)
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="bg-muted p-6 rounded-lg min-h-[200px] text-sm">
                 <p className="text-muted-foreground mb-4">
-                  [سيظهر النص المستخرج هنا من محرك الذكاء الاصطناعي]
+                  [Extracted text will appear here from the AI engine]
                 </p>
                 <p className="text-muted-foreground">
-                  ستعرض هذه المنطقة المحتوى الكامل المستخرج بتقنية OCR من المستند المحمّل...
+                  This area will display the full OCR-extracted content from the uploaded document...
                 </p>
               </div>
               <div className="mt-4 p-4 bg-accent/10 border border-accent rounded-lg">
                 <p className="text-sm text-foreground">
-                  💡 <strong>ملاحظة التكامل:</strong> قم بالاتصال بواجهة API لعرض بيانات النص المستخرج هنا.
+                  💡 <strong>Integration Note:</strong> Connect to API to display extracted text data here.
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* المناطق المشبوهة / مؤشرات التزوير */}
+          {/* Suspicious Areas / Forgery Indicators */}
           <Card className="border-2 border-destructive/20">
             <CardHeader className="bg-destructive/5">
               <CardTitle className="flex items-center gap-2 text-destructive">
                 <AlertTriangle className="h-5 w-5" />
-                المناطق المشبوهة / مؤشرات التزوير
+                Suspicious Areas / Forgery Indicators
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-4">
                 <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
-                  <p className="font-semibold text-destructive mb-2">المؤشر 1</p>
+                  <p className="font-semibold text-destructive mb-2">Indicator 1</p>
                   <p className="text-sm text-muted-foreground">
-                    [وصف النمط المشبوه الذي اكتشفه الذكاء الاصطناعي]
+                    [Description of suspicious pattern detected by AI]
                   </p>
                 </div>
                 <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
-                  <p className="font-semibold text-destructive mb-2">المؤشر 2</p>
+                  <p className="font-semibold text-destructive mb-2">Indicator 2</p>
                   <p className="text-sm text-muted-foreground">
-                    [وصف الشذوذ أو التناقض الذي تم العثور عليه]
+                    [Description of anomaly or inconsistency found]
                   </p>
                 </div>
                 <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
-                  <p className="font-semibold text-destructive mb-2">المؤشر 3</p>
+                  <p className="font-semibold text-destructive mb-2">Indicator 3</p>
                   <p className="text-sm text-muted-foreground">
-                    [نتائج مشبوهة إضافية من تحليل الذكاء الاصطناعي]
+                    [Additional suspicious findings from AI analysis]
                   </p>
                 </div>
               </div>
               <div className="mt-4 p-4 bg-accent/10 border border-accent rounded-lg">
                 <p className="text-sm text-foreground">
-                  💡 <strong>ملاحظة التكامل:</strong> سيعرض هذا القسم مصفوفة من مؤشرات التزوير المحددة بواسطة تحليل الذكاء الاصطناعي.
+                  💡 <strong>Integration Note:</strong> This section will display an array of forgery indicators identified by AI analysis.
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* القرار النهائي للذكاء الاصطناعي */}
+          {/* AI Final Decision */}
           <Card className="border-2 border-primary">
             <CardHeader className="bg-primary/5">
               <CardTitle className="flex items-center gap-2 text-primary">
                 <CheckCircle2 className="h-5 w-5" />
-                القرار النهائي للذكاء الاصطناعي
+                AI Final Decision
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
@@ -159,14 +159,14 @@ const Results = () => {
                 <div className="inline-block p-6 bg-muted rounded-full mb-4">
                   <CheckCircle2 className="h-16 w-16 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-2">في انتظار التحليل</h3>
+                <h3 className="text-2xl font-bold mb-2">Awaiting Analysis</h3>
                 <p className="text-muted-foreground max-w-md mx-auto">
-                  سيتم عرض الحكم النهائي هنا بعد اكتمال تحليل الذكاء الاصطناعي.
-                  سيشير هذا إلى ما إذا كان المستند أصليًا أو مزورًا محتملاً.
+                  The final verdict will be displayed here after AI analysis is complete.
+                  This will indicate whether the document is authentic or potentially forged.
                 </p>
                 <div className="mt-6 p-4 bg-primary/10 border border-primary rounded-lg max-w-2xl mx-auto">
                   <p className="text-sm">
-                    <strong>المخرجات المتوقعة:</strong> استجابة JSON تحتوي على درجة الثقة ومستوى المخاطر والتفسير التفصيلي من نماذج الذكاء الاصطناعي.
+                    <strong>Expected Output:</strong> JSON response containing confidence score, risk level, and detailed explanation from AI models.
                   </p>
                 </div>
               </div>
@@ -174,15 +174,15 @@ const Results = () => {
           </Card>
         </div>
 
-        {/* أزرار الإجراءات */}
+        {/* Action Buttons */}
         <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
           <Button
             size="lg"
             variant="outline"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/en")}
             className="text-base"
           >
-            مسح مستند آخر
+            Scan Another Document
           </Button>
         </div>
       </div>
@@ -190,4 +190,4 @@ const Results = () => {
   );
 };
 
-export default Results;
+export default ResultsEn;

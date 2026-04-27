@@ -20,23 +20,23 @@ import { useToast } from "@/hooks/use-toast";
 const formSchema = z.object({
   fullName: z
     .string()
-    .min(1, "الاسم الثلاثي مطلوب")
+    .min(1, "Full name is required")
     .refine((name) => {
       const parts = name.trim().split(/\s+/);
       return parts.length >= 3;
-    }, "يجب إدخال ثلاثة أسماء (الاسم الأول + اسم الأب + اسم العائلة)"),
+    }, "Please enter three names (First + Middle + Last name)"),
   email: z
     .string()
-    .min(1, "البريد الإلكتروني مطلوب")
-    .email("يرجى إدخال بريد إلكتروني صالح")
-    .refine((email) => email.endsWith("@gmail.com"), "يجب أن يكون البريد الإلكتروني من Gmail فقط (@gmail.com)"),
-  documentType: z.string().min(1, "نوع المستند مطلوب"),
-  document: z.instanceof(File, { message: "يرجى تحميل المستند" }),
+    .min(1, "Email is required")
+    .email("Please enter a valid email address")
+    .refine((email) => email.endsWith("@gmail.com"), "Only Gmail addresses (@gmail.com) are accepted"),
+  documentType: z.string().min(1, "Document type is required"),
+  document: z.instanceof(File, { message: "Please upload a document" }),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-const Index = () => {
+const IndexEn = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -52,12 +52,12 @@ const Index = () => {
 
   const onSubmit = (data: FormData) => {
     toast({
-      title: "جاري مسح المستند",
-      description: "سيتم تنفيذ تحليل المستند باستخدام محرك ذكاء اصطناعي",
+      title: "Scanning Document",
+      description: "Document analysis will be performed using an AI engine",
     });
     
     setTimeout(() => {
-      navigate("/results", { 
+      navigate("/en/results", { 
         state: { 
           formData: data,
           fileName: selectedFile?.name 
@@ -75,41 +75,41 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4" dir="ltr">
       <LanguageToggle />
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-primary mb-3">
-            الماسح القانوني الذكي
+            Smart Legal Scanner
           </h1>
           <p className="text-muted-foreground text-lg">
-            قم بتحميل مستندك لفحص التزوير بواسطة الذكاء الاصطناعي
+            Upload your document to check for forgery using AI
           </p>
         </div>
 
         <div className="bg-card rounded-2xl shadow-lg border border-border p-6 md:p-10">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* الاسم الثلاثي */}
+            {/* Full Name */}
             <div className="space-y-2">
               <Label htmlFor="fullName" className="text-base font-semibold">
-                الاسم الثلاثي *
+                Full Name *
               </Label>
               <Input
                 id="fullName"
                 {...register("fullName")}
-                placeholder="أدخل الاسم الأول + اسم الأب + اسم العائلة"
-                className="h-14 text-base text-right"
-                dir="rtl"
+                placeholder="Enter First + Middle + Last name"
+                className="h-14 text-base text-left"
+                dir="ltr"
               />
               {errors.fullName && (
                 <p className="text-destructive text-sm">{errors.fullName.message}</p>
               )}
             </div>
 
-            {/* البريد الإلكتروني */}
+            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-base font-semibold">
-                البريد الإلكتروني *
+                Email Address *
               </Label>
               <Input
                 id="email"
@@ -120,28 +120,28 @@ const Index = () => {
                 dir="ltr"
               />
               <p className="text-xs text-muted-foreground">
-                يُقبل فقط البريد الإلكتروني من Gmail
+                Only Gmail addresses are accepted
               </p>
               {errors.email && (
                 <p className="text-destructive text-sm">{errors.email.message}</p>
               )}
             </div>
 
-            {/* نوع المستند */}
+            {/* Document Type */}
             <div className="space-y-2">
               <Label htmlFor="documentType" className="text-base font-semibold">
-                نوع المستند *
+                Document Type *
               </Label>
               <Select
                 onValueChange={(value) => setValue("documentType", value)}
               >
                 <SelectTrigger className="h-14 text-base bg-background">
-                  <SelectValue placeholder="اختر نوع المستند" />
+                  <SelectValue placeholder="Select document type" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover">
-                  <SelectItem value="contract">عقد</SelectItem>
-                  <SelectItem value="document">مستند</SelectItem>
-                  <SelectItem value="cheque">شيك</SelectItem>
+                  <SelectItem value="contract">Contract</SelectItem>
+                  <SelectItem value="document">Document</SelectItem>
+                  <SelectItem value="cheque">Cheque</SelectItem>
                 </SelectContent>
               </Select>
               {errors.documentType && (
@@ -149,10 +149,10 @@ const Index = () => {
               )}
             </div>
 
-            {/* تحميل المستند */}
+            {/* Upload Document */}
             <div className="space-y-2">
               <Label htmlFor="document" className="text-base font-semibold">
-                تحميل المستند *
+                Upload Document *
               </Label>
               <div className="relative">
                 <Input
@@ -160,13 +160,13 @@ const Index = () => {
                   type="file"
                   accept="image/*,.pdf"
                   onChange={handleFileChange}
-                  className="h-14 text-base cursor-pointer file:ml-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                  className="h-14 text-base cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
                 />
-                <Camera className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground pointer-events-none" />
+                <Camera className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground pointer-events-none" />
               </div>
               {selectedFile && (
                 <p className="text-sm text-muted-foreground">
-                  الملف المحدد: {selectedFile.name}
+                  Selected file: {selectedFile.name}
                 </p>
               )}
               {errors.document && (
@@ -174,17 +174,17 @@ const Index = () => {
               )}
             </div>
 
-            {/* زر المسح */}
+            {/* Scan Button */}
             <Button
               type="submit"
               className="w-full h-16 text-lg font-semibold"
               size="lg"
             >
-              🔍 مسح ضوئي
+              🔍 Scan Document
             </Button>
 
             <p className="text-center text-sm text-muted-foreground">
-              سيتم تنفيذ تحليل المستند باستخدام محرك ذكاء اصطناعي
+              Document analysis will be performed using an AI engine
             </p>
           </form>
         </div>
@@ -193,4 +193,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default IndexEn;
