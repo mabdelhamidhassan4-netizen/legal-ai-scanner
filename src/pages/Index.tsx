@@ -71,9 +71,25 @@ const Index = () => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      setValue("document", file);
+      setValue("document", file, { shouldValidate: true });
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(file.type.startsWith("image/") ? URL.createObjectURL(file) : null);
     }
   };
+
+  const handleRemoveFile = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setValue("document", undefined as never, { shouldValidate: true });
+  };
+
+  const formatSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4" dir="rtl">
