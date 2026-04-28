@@ -133,11 +133,42 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Server-side validation: enforce file size and MIME type independently of client
+    const MAX_BASE64_LEN = 14_000_000; // ~10MB encoded
+    const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg", "application/pdf"];
+
+    if (typeof fileBase64 !== "string" || fileBase64.length > MAX_BASE64_LEN) {
+      return new Response(
+        JSON.stringify({ error: "حجم الملف يتجاوز الحد المسموح (10 ميجابايت)" }),
+        { status: 413, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    if (typeof mimeType !== "string" || !ALLOWED_TYPES.includes(mimeType)) {
+      return new Response(
+        JSON.stringify({ error: "نوع الملف غير مدعوم" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    // Sanitize prompt-interpolated inputs to mitigate prompt injection
+    const sanitize = (v: unknown, max: number): string => {
+      if (typeof v !== "string") return "غير محدد";
+      // Strip control chars and collapse whitespace
+      const cleaned = v.replace(/[\u0000-\u001F\u007F]/g, " ").replace(/\s+/g, " ").trim();
+      return cleaned.slice(0, max) || "غير محدد";
+    };
+
+    const safeFullName = sanitize(fullName, 120);
+    const safeEmail = sanitize(email, 254);
+    const safeDocumentType = sanitize(documentType, 80);
+    const safeFileName = sanitize(fileName, 200);
+
     const userText = `بيانات مقدم الطلب:
-- الاسم: ${fullName ?? "غير محدد"}
-- البريد: ${email ?? "غير محدد"}
-- نوع المستند الذي حدده المستخدم: ${documentType ?? "غير محدد"}
-- اسم الملف: ${fileName ?? "غير محدد"}
+- الاسم: ${safeFullName}
+- البريد: ${safeEmail}
+- نوع المستند الذي حدده المستخدم: ${safeDocumentType}
+- اسم الملف: ${safeFileName}
 
 افحص المستند المرفق وأرجع النتيجة عبر الأداة submit_legal_analysis فقط.`;
 
