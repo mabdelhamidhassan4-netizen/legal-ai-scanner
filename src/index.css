@@ -2,95 +2,99 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* legalAI Scanner — Design System
+   Primary: Dark Navy Blue #1e3a5f
+   Accent:  Gold #c9a84c
+   All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 215 25% 15%;
+    --background: 210 25% 98%;
+    --foreground: 213 50% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 213 50% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 213 50% 15%;
 
-    --primary: 215 85% 35%;
+    /* Dark navy blue #1e3a5f -> hsl(213, 52%, 25%) */
+    --primary: 213 52% 25%;
     --primary-foreground: 0 0% 100%;
+    --primary-glow: 213 52% 35%;
 
-    --secondary: 215 20% 92%;
-    --secondary-foreground: 215 25% 15%;
+    --secondary: 213 25% 94%;
+    --secondary-foreground: 213 50% 20%;
 
-    --muted: 215 15% 95%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 213 20% 96%;
+    --muted-foreground: 213 15% 45%;
 
-    --accent: 215 75% 45%;
-    --accent-foreground: 0 0% 100%;
+    /* Gold #c9a84c -> hsl(43, 54%, 54%) */
+    --accent: 43 54% 54%;
+    --accent-foreground: 213 50% 15%;
+    --accent-glow: 43 64% 64%;
 
-    --destructive: 0 75% 55%;
+    --destructive: 0 75% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 20% 88%;
-    --input: 215 20% 90%;
-    --ring: 215 85% 35%;
+    --success: 142 65% 38%;
+    --success-foreground: 0 0% 100%;
 
-    --radius: 0.75rem;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --orange-status: 24 95% 53%;
+    --orange-status-foreground: 0 0% 100%;
+
+    --neutral-status: 215 14% 35%;
+    --neutral-status-foreground: 0 0% 100%;
+
+    --border: 213 20% 88%;
+    --input: 213 20% 90%;
+    --ring: 213 52% 25%;
+
+    --radius: 0.875rem;
+
+    --gradient-primary: linear-gradient(135deg, hsl(213 52% 25%), hsl(213 52% 35%));
+    --gradient-accent: linear-gradient(135deg, hsl(43 54% 54%), hsl(43 64% 64%));
+    --gradient-hero: linear-gradient(160deg, hsl(213 52% 25%) 0%, hsl(213 52% 18%) 100%);
+
+    --shadow-elegant: 0 10px 40px -10px hsl(213 52% 25% / 0.25);
+    --shadow-soft: 0 4px 20px -4px hsl(213 52% 25% / 0.12);
+    --shadow-gold: 0 6px 30px -8px hsl(43 54% 54% / 0.4);
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 215 30% 8%;
+    --background: 213 40% 8%;
     --foreground: 0 0% 98%;
-
-    --card: 215 25% 12%;
+    --card: 213 35% 12%;
     --card-foreground: 0 0% 98%;
-
-    --popover: 215 25% 12%;
+    --popover: 213 35% 12%;
     --popover-foreground: 0 0% 98%;
-
-    --primary: 215 75% 45%;
+    --primary: 213 52% 45%;
     --primary-foreground: 0 0% 100%;
-
-    --secondary: 215 20% 18%;
+    --primary-glow: 213 52% 55%;
+    --secondary: 213 25% 18%;
     --secondary-foreground: 0 0% 98%;
-
-    --muted: 215 20% 18%;
-    --muted-foreground: 215 15% 65%;
-
-    --accent: 215 75% 45%;
-    --accent-foreground: 0 0% 100%;
-
+    --muted: 213 25% 18%;
+    --muted-foreground: 213 15% 65%;
+    --accent: 43 54% 54%;
+    --accent-foreground: 213 50% 15%;
     --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
-
-    --border: 215 20% 20%;
-    --input: 215 20% 20%;
-    --ring: 215 75% 45%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 213 25% 20%;
+    --input: 213 25% 20%;
+    --ring: 213 52% 45%;
   }
 }
 
@@ -101,5 +105,32 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Tajawal', 'Cairo', system-ui, -apple-system, sans-serif;
   }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  .shadow-gold {
+    box-shadow: var(--shadow-gold);
+  }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
 }
