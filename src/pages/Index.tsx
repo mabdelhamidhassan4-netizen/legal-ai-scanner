@@ -171,23 +171,63 @@ const Index = () => {
               <Label htmlFor="document" className="text-base font-semibold">
                 تحميل المستند *
               </Label>
-              <div className="relative">
-                <Input
-                  id="document"
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={handleFileChange}
-                  className="h-14 text-base cursor-pointer file:ml-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                />
-                <Camera className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground pointer-events-none" />
-              </div>
-              {selectedFile && (
-                <p className="text-sm text-muted-foreground">
-                  الملف المحدد: {selectedFile.name}
-                </p>
+
+              {!selectedFile ? (
+                <label
+                  htmlFor="document"
+                  className={`flex flex-col items-center justify-center gap-2 h-32 w-full rounded-md border-2 border-dashed cursor-pointer transition-colors bg-background hover:bg-accent/30 ${
+                    errors.document ? "border-destructive" : "border-input"
+                  }`}
+                >
+                  <UploadCloud className="h-8 w-8 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    اضغط لاختيار ملف (صورة أو PDF)
+                  </span>
+                  <input
+                    id="document"
+                    type="file"
+                    accept="image/*,.pdf"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+              ) : (
+                <div
+                  className={`flex items-center gap-3 p-3 rounded-md border bg-background ${
+                    errors.document ? "border-destructive" : "border-input"
+                  }`}
+                >
+                  {previewUrl ? (
+                    <img
+                      src={previewUrl}
+                      alt="معاينة الملف"
+                      className="h-16 w-16 rounded object-cover border border-border"
+                    />
+                  ) : (
+                    <div className="h-16 w-16 rounded bg-muted flex items-center justify-center">
+                      <FileText className="h-8 w-8 text-primary" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0 text-right">
+                    <p className="text-sm font-medium truncate">{selectedFile.name}</p>
+                    <p className="text-xs text-muted-foreground">{formatSize(selectedFile.size)}</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleRemoveFile}
+                    aria-label="إزالة الملف"
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
               )}
+
               {errors.document && (
-                <p className="text-destructive text-sm">{errors.document.message}</p>
+                <p role="alert" className="text-destructive text-sm flex items-center gap-1">
+                  {errors.document.message as string}
+                </p>
               )}
             </div>
 
