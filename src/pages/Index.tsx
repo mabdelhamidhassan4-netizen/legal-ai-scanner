@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Camera } from "lucide-react";
-import LanguageToggle from "@/components/LanguageToggle";
+import { Camera, Search, ScanLine, Upload, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,178 +16,300 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
+// Compound name prefixes that should be treated as a single naming unit
+const COMPOUND_PREFIXES = [
+  "عبد",
+  "نور",
+  "سيف",
+  "أبو",
+  "ابو",
+  "ابن",
+  "بن",
+  "ام",
+  "أم",
+];
+
+/**
+ * Counts naming units in a full name, treating compound names like
+ * "عبدالرحمن" or "عبد الرحمن" or "نور الدين" as a single unit.
+ */
+function countNameUnits(name: string): number {
+  const tokens = name.trim().split(/\s+/).filter(Boolean);
+  let units = 0;
+  let i = 0;
+  while (i < tokens.length) {
+    const tok = tokens[i];
+    // Case 1: token already contains the compound joined (عبدالرحمن)
+    const isJoinedCompound = COMPOUND_PREFIXES.some(
+      (p) => tok.startsWith(p) && tok.length > p.length + 1,
+    );
+    // Case 2: separated compound (عبد الرحمن) — combine with next token
+    const isSeparatedPrefix =
+      COMPOUND_PREFIXES.includes(tok) && i + 1 < tokens.length;
+
+    if (isSeparatedPrefix) {
+      units += 1;
+      i += 2;
+    } else if (isJoinedCompound) {
+      units += 1;
+      i += 1;
+    } else {
+      units += 1;
+      i += 1;
+    }
+  }
+  return units;
+}
+
+const DOCUMENT_TYPES = [
+  "عقد بيع عقار",
+  "عقد إيجار",
+  "عقد عمل وتوظيف",
+  "عقد مقاولة",
+  "عقد شركة / مشاركة تجارية",
+  "توكيل رسمي / وكالة",
+  "سند / شيك / إقرار مالي",
+  "مستند رسمي آخر",
+];
+
+const MAX_SIZE = 10 * 1024 * 1024;
+const ACCEPTED_TYPES = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
+
 const formSchema = z.object({
   fullName: z
     .string()
-    .min(1, "الاسم الثلاثي مطلوب")
-    .refine((name) => {
-      const parts = name.trim().split(/\s+/);
-      return parts.length >= 3;
-    }, "يجب إدخال ثلاثة أسماء (الاسم الأول + اسم الأب + اسم العائلة)"),
+    .min(1, "يرجى إدخال الاسم الثلاثي كاملاً")
+    .refine((n) => countNameUnits(n) >= 3, "يرجى إدخال الاسم الثلاثي كاملاً"),
   email: z
     .string()
-    .min(1, "البريد الإلكتروني مطلوب")
-    .email("يرجى إدخال بريد إلكتروني صالح")
-    .refine((email) => email.endsWith("@gmail.com"), "يجب أن يكون البريد الإلكتروني من Gmail فقط (@gmail.com)"),
-  documentType: z.string().min(1, "نوع المستند مطلوب"),
-  document: z.instanceof(File, { message: "يرجى تحميل المستند" }),
+    .min(1, "يرجى إدخال بريد إلكتروني صحيح")
+    .email("يرجى إدخال بريد إلكتروني صحيح"),
+  documentType: z.string().min(1, "يرجى اختيار نوع المستند"),
+  document: z
+    .instanceof(File, { message: "يرجى تحميل المستند المراد فحصه" })
+    .refine((f) => ACCEPTED_TYPES.includes(f.type), "الصيغة غير مدعومة (PDF, JPG, PNG)")
+    .refine((f) => f.size <= MAX_SIZE, "الحد الأقصى للحجم 10MB"),
 });
 
 type FormData = z.infer<typeof formSchema>;
+
+const fileToBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      const base64 = result.split(",")[1] ?? "";
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-  });
+  } = useForm<FormData>({ resolver: zodResolver(formSchema) });
 
-  const onSubmit = (data: FormData) => {
-    toast({
-      title: "جاري مسح المستند",
-      description: "سيتم تنفيذ تحليل المستند باستخدام محرك ذكاء اصطناعي",
-    });
-    
-    setTimeout(() => {
-      navigate("/results", { 
-        state: { 
-          formData: data,
-          fileName: selectedFile?.name 
-        } 
+  const onSubmit = async (data: FormData) => {
+    setSubmitting(true);
+    try {
+      const fileBase64 = await fileToBase64(data.document);
+      navigate("/results", {
+        state: {
+          formData: {
+            fullName: data.fullName,
+            email: data.email,
+            documentType: data.documentType,
+          },
+          fileName: data.document.name,
+          fileBase64,
+          mimeType: data.document.type,
+        },
       });
-    }, 1500);
+    } catch (e) {
+      toast({
+        title: "حدث خطأ",
+        description: "تعذّر تجهيز الملف للتحليل",
+        variant: "destructive",
+      });
+      setSubmitting(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      setValue("document", file);
+      setValue("document", file, { shouldValidate: true });
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4" dir="rtl">
-      <LanguageToggle />
-      <div className="w-full max-w-2xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-3">
-            الماسح القانوني الذكي
+    <div className="min-h-screen bg-background" dir="rtl">
+      {/* Hero header */}
+      <header className="gradient-hero text-primary-foreground">
+        <div className="max-w-3xl mx-auto px-4 pt-10 pb-12 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent mb-4 shadow-gold">
+            <ShieldCheck className="w-9 h-9 text-accent-foreground" />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+            <span className="text-accent">legal</span>AI Scanner
           </h1>
-          <p className="text-muted-foreground text-lg">
-            قم بتحميل مستندك لفحص التزوير بواسطة الذكاء الاصطناعي
+          <p className="mt-3 text-base md:text-lg opacity-90 leading-relaxed">
+            فحص العقود والمستندات بالذكاء الاصطناعي
+          </p>
+          <p className="mt-1 text-sm opacity-70">
+            وفق القانون المدني المصري وأحكام محكمة النقض
           </p>
         </div>
+      </header>
 
-        <div className="bg-card rounded-2xl shadow-lg border border-border p-6 md:p-10">
+      <main className="max-w-2xl mx-auto px-4 -mt-8 pb-12">
+        <div className="bg-card rounded-2xl shadow-elegant border border-border p-6 md:p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* الاسم الثلاثي */}
+            {/* Full name */}
             <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-base font-semibold">
+              <Label htmlFor="fullName" className="text-base font-bold text-foreground">
                 الاسم الثلاثي *
               </Label>
               <Input
                 id="fullName"
                 {...register("fullName")}
-                placeholder="أدخل الاسم الأول + اسم الأب + اسم العائلة"
-                className="h-14 text-base text-right"
+                placeholder="مثال: محمد أحمد السيد"
+                className="h-14 text-base"
                 dir="rtl"
               />
+              <p className="text-xs text-muted-foreground">
+                يرجى إدخال الاسم الأول + اسم الأب + اسم العائلة
+              </p>
               {errors.fullName && (
-                <p className="text-destructive text-sm">{errors.fullName.message}</p>
+                <p className="text-destructive text-sm font-medium">
+                  {errors.fullName.message}
+                </p>
               )}
             </div>
 
-            {/* البريد الإلكتروني */}
+            {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-base font-semibold">
+              <Label htmlFor="email" className="text-base font-bold text-foreground">
                 البريد الإلكتروني *
               </Label>
               <Input
                 id="email"
                 type="email"
                 {...register("email")}
-                placeholder="example@gmail.com"
-                className="h-14 text-base text-left"
+                placeholder="example@email.com"
+                className="h-14 text-base"
                 dir="ltr"
               />
-              <p className="text-xs text-muted-foreground">
-                يُقبل فقط البريد الإلكتروني من Gmail
-              </p>
               {errors.email && (
-                <p className="text-destructive text-sm">{errors.email.message}</p>
+                <p className="text-destructive text-sm font-medium">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
-            {/* نوع المستند */}
+            {/* Document type */}
             <div className="space-y-2">
-              <Label htmlFor="documentType" className="text-base font-semibold">
+              <Label htmlFor="documentType" className="text-base font-bold text-foreground">
                 نوع المستند *
               </Label>
-              <Select
-                onValueChange={(value) => setValue("documentType", value)}
-              >
+              <Select onValueChange={(v) => setValue("documentType", v, { shouldValidate: true })}>
                 <SelectTrigger className="h-14 text-base bg-background">
                   <SelectValue placeholder="اختر نوع المستند" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover">
-                  <SelectItem value="contract">عقد</SelectItem>
-                  <SelectItem value="document">مستند</SelectItem>
-                  <SelectItem value="cheque">شيك</SelectItem>
+                  {DOCUMENT_TYPES.map((t) => (
+                    <SelectItem key={t} value={t} className="text-base">
+                      {t}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {errors.documentType && (
-                <p className="text-destructive text-sm">{errors.documentType.message}</p>
+                <p className="text-destructive text-sm font-medium">
+                  {errors.documentType.message}
+                </p>
               )}
             </div>
 
-            {/* تحميل المستند */}
+            {/* Document upload */}
             <div className="space-y-2">
-              <Label htmlFor="document" className="text-base font-semibold">
+              <Label htmlFor="document" className="text-base font-bold text-foreground">
                 تحميل المستند *
               </Label>
-              <div className="relative">
+              <label
+                htmlFor="document"
+                className="relative flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-border rounded-xl bg-muted/30 hover:bg-muted/60 cursor-pointer transition-colors"
+              >
+                <div className="flex items-center gap-3 text-primary">
+                  <Camera className="h-7 w-7" />
+                  <Upload className="h-6 w-6" />
+                </div>
+                <p className="text-base font-semibold text-foreground">
+                  اختر ملفاً أو التقط صورة
+                </p>
+                <p className="text-xs text-muted-foreground text-center">
+                  PDF, JPG, PNG, JPEG — الحد الأقصى 10MB
+                </p>
+                <p className="text-xs text-muted-foreground text-center">
+                  يمكنك رفع صورة أو ملف PDF
+                </p>
                 <Input
                   id="document"
                   type="file"
-                  accept="image/*,.pdf"
+                  accept="application/pdf,image/png,image/jpeg,image/jpg"
+                  capture="environment"
                   onChange={handleFileChange}
-                  className="h-14 text-base cursor-pointer file:ml-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                  className="absolute inset-0 opacity-0 cursor-pointer"
                 />
-                <Camera className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground pointer-events-none" />
-              </div>
+              </label>
               {selectedFile && (
-                <p className="text-sm text-muted-foreground">
-                  الملف المحدد: {selectedFile.name}
+                <p className="text-sm text-success font-medium">
+                  ✓ تم اختيار: {selectedFile.name}
                 </p>
               )}
               {errors.document && (
-                <p className="text-destructive text-sm">{errors.document.message}</p>
+                <p className="text-destructive text-sm font-medium">
+                  {errors.document.message as string}
+                </p>
               )}
             </div>
 
-            {/* زر المسح */}
+            {/* Submit button */}
             <Button
               type="submit"
-              className="w-full h-16 text-lg font-semibold"
+              disabled={submitting}
+              className="w-full h-16 text-lg font-bold gradient-primary hover:opacity-95 shadow-elegant"
               size="lg"
             >
-              🔍 مسح ضوئي
+              {submitting ? (
+                <>
+                  <ScanLine className="ml-2 h-5 w-5 animate-pulse" />
+                  جارٍ التجهيز...
+                </>
+              ) : (
+                <>
+                  <Search className="ml-2 h-5 w-5" />
+                  بحث
+                </>
+              )}
             </Button>
 
-            <p className="text-center text-sm text-muted-foreground">
-              سيتم تنفيذ تحليل المستند باستخدام محرك ذكاء اصطناعي
+            <p className="text-center text-xs text-muted-foreground leading-relaxed">
+              يتم التحليل وفق القانون المدني المصري رقم 131 لسنة 1948 وأحكام محكمة النقض
             </p>
           </form>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
