@@ -156,47 +156,47 @@ const Index = () => {
     <div className="min-h-screen bg-background" dir="rtl">
       {/* Hero header */}
       <header className="gradient-hero text-primary-foreground relative">
-        <div className="max-w-3xl mx-auto px-4 pt-10 pb-12 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent mb-4 shadow-gold">
-            <ShieldCheck className="w-9 h-9 text-accent-foreground" />
+        <div className="max-w-3xl mx-auto px-5 pt-8 pb-14 text-center">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-accent mb-3 shadow-gold">
+            <ShieldCheck className="w-8 h-8 text-accent-foreground" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+          <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight">
             <span className="text-accent">legal</span>AI Scanner
           </h1>
-          <p className="mt-3 text-sm md:text-base opacity-90 leading-relaxed">
+          <p className="mt-2 text-sm md:text-base opacity-90 leading-relaxed">
             فحص العقود والمستندات بالذكاء الاصطناعي
           </p>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 -mt-6 pb-12">
-        <div className="bg-card rounded-2xl shadow-elegant border border-border p-6 md:p-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <main className="max-w-2xl mx-auto px-4 -mt-8 pb-10">
+        <div className="bg-card rounded-2xl shadow-elegant border border-border p-5 md:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Full name */}
-            <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-base font-bold text-foreground">
+            <div className="space-y-1.5">
+              <Label htmlFor="fullName" className="text-sm md:text-base font-bold text-foreground">
                 الاسم الثلاثي *
               </Label>
               <Input
                 id="fullName"
                 {...register("fullName")}
                 placeholder="مثال: محمد أحمد السيد"
-                className="h-14 text-base"
+                className="h-12 md:h-14 text-sm md:text-base"
                 dir="rtl"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 يرجى إدخال الاسم الأول + اسم الأب + اسم العائلة
               </p>
               {errors.fullName && (
-                <p className="text-destructive text-sm font-medium">
+                <p className="text-destructive text-xs md:text-sm font-medium">
                   {errors.fullName.message}
                 </p>
               )}
             </div>
 
             {/* Email */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-base font-bold text-foreground">
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-sm md:text-base font-bold text-foreground">
                 البريد الإلكتروني *
               </Label>
               <Input
@@ -204,61 +204,58 @@ const Index = () => {
                 type="email"
                 {...register("email")}
                 placeholder="example@email.com"
-                className="h-14 text-base"
+                className="h-12 md:h-14 text-sm md:text-base"
                 dir="ltr"
               />
               {errors.email && (
-                <p className="text-destructive text-sm font-medium">
+                <p className="text-destructive text-xs md:text-sm font-medium">
                   {errors.email.message}
                 </p>
               )}
             </div>
 
             {/* Document type */}
-            <div className="space-y-2">
-              <Label htmlFor="documentType" className="text-base font-bold text-foreground">
+            <div className="space-y-1.5">
+              <Label htmlFor="documentType" className="text-sm md:text-base font-bold text-foreground">
                 نوع المستند *
               </Label>
               <Select onValueChange={(v) => setValue("documentType", v, { shouldValidate: true })}>
-                <SelectTrigger className="h-14 text-base bg-background">
+                <SelectTrigger className="h-12 md:h-14 text-sm md:text-base bg-background">
                   <SelectValue placeholder="اختر نوع المستند" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover">
                   {DOCUMENT_TYPES.map((t) => (
-                    <SelectItem key={t} value={t} className="text-base">
+                    <SelectItem key={t} value={t} className="text-sm md:text-base">
                       {t}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {errors.documentType && (
-                <p className="text-destructive text-sm font-medium">
+                <p className="text-destructive text-xs md:text-sm font-medium">
                   {errors.documentType.message}
                 </p>
               )}
             </div>
 
             {/* Document upload */}
-            <div className="space-y-2">
-              <Label htmlFor="document" className="text-base font-bold text-foreground">
+            <div className="space-y-1.5">
+              <Label htmlFor="document" className="text-sm md:text-base font-bold text-foreground">
                 تحميل المستند *
               </Label>
               <label
                 htmlFor="document"
-                className="relative flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-border rounded-xl bg-muted/30 hover:bg-muted/60 cursor-pointer transition-colors"
+                className="relative flex flex-col items-center justify-center gap-2 p-5 md:p-6 border-2 border-dashed border-border rounded-xl bg-muted/30 hover:bg-muted/60 cursor-pointer transition-colors"
               >
                 <div className="flex items-center gap-3 text-primary">
-                  <Camera className="h-7 w-7" />
-                  <Upload className="h-6 w-6" />
+                  <Camera className="h-6 w-6 md:h-7 md:w-7" />
+                  <Upload className="h-5 w-5 md:h-6 md:w-6" />
                 </div>
-                <p className="text-base font-semibold text-foreground">
+                <p className="text-sm md:text-base font-semibold text-foreground">
                   اختر ملفاً أو التقط صورة
                 </p>
-                <p className="text-xs text-muted-foreground text-center">
+                <p className="text-xs text-muted-foreground text-center leading-relaxed">
                   PDF, JPG, PNG, JPEG — الحد الأقصى 10MB
-                </p>
-                <p className="text-xs text-muted-foreground text-center">
-                  يمكنك رفع صورة أو ملف PDF
                 </p>
                 <Input
                   id="document"
@@ -270,12 +267,12 @@ const Index = () => {
                 />
               </label>
               {selectedFile && (
-                <p className="text-sm text-success font-medium">
+                <p className="text-xs md:text-sm text-success font-medium truncate">
                   ✓ تم اختيار: {selectedFile.name}
                 </p>
               )}
               {errors.document && (
-                <p className="text-destructive text-sm font-medium">
+                <p className="text-destructive text-xs md:text-sm font-medium">
                   {errors.document.message as string}
                 </p>
               )}
@@ -285,7 +282,7 @@ const Index = () => {
             <Button
               type="submit"
               disabled={submitting}
-              className="w-full h-16 text-lg font-bold gradient-primary hover:opacity-95 shadow-elegant"
+              className="w-full h-14 md:h-16 text-base md:text-lg font-bold gradient-primary hover:opacity-95 shadow-elegant"
               size="lg"
             >
               {submitting ? (
