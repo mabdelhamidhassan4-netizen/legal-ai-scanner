@@ -299,11 +299,6 @@ const Index = () => {
                   بحث
                 </>
               )}
-            </Button>
-
-            <p className="text-center text-xs text-muted-foreground leading-relaxed">
-              يتم التحليل وفق القانون المدني المصري رقم 131 لسنة 1948 وأحكام محكمة النقض
-            </p>
           </form>
         </div>
       </main>
