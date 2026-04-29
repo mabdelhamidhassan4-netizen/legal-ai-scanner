@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Camera, Search, ScanLine, Upload, ShieldCheck, LogOut } from "lucide-react";
+import { Camera, Search, ScanLine, Upload, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +15,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 // Compound name prefixes that should be treated as a single naming unit
 const COMPOUND_PREFIXES = [
@@ -158,18 +157,6 @@ const Index = () => {
       {/* Hero header */}
       <header className="gradient-hero text-primary-foreground relative">
         <div className="max-w-3xl mx-auto px-4 pt-10 pb-12 text-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={async () => {
-              await supabase.auth.signOut();
-              navigate("/auth", { replace: true });
-            }}
-            className="absolute top-4 left-4 text-primary-foreground hover:bg-white/10 hover:text-primary-foreground"
-          >
-            <LogOut className="ml-1 h-4 w-4" />
-            خروج
-          </Button>
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent mb-4 shadow-gold">
             <ShieldCheck className="w-9 h-9 text-accent-foreground" />
           </div>

@@ -115,35 +115,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // ===== Authentication: validate JWT in code (verify_jwt = false) =====
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(
-        JSON.stringify({ error: "غير مصرح — يرجى تسجيل الدخول" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-    const token = authHeader.replace("Bearer ", "");
-
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-    const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      return new Response(
-        JSON.stringify({ error: "إعدادات الخادم غير مكتملة" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-
-    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.45.0");
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims?.sub) {
-      return new Response(
-        JSON.stringify({ error: "جلسة غير صالحة — يرجى إعادة تسجيل الدخول" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       return new Response(
