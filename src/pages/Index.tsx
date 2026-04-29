@@ -163,16 +163,13 @@ const Index = () => {
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
             <span className="text-accent">legal</span>AI Scanner
           </h1>
-          <p className="mt-3 text-base md:text-lg opacity-90 leading-relaxed">
+          <p className="mt-3 text-sm md:text-base opacity-90 leading-relaxed">
             فحص العقود والمستندات بالذكاء الاصطناعي
-          </p>
-          <p className="mt-1 text-sm opacity-70">
-            وفق القانون المدني المصري وأحكام محكمة النقض
           </p>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 -mt-8 pb-12">
+      <main className="max-w-2xl mx-auto px-4 -mt-6 pb-12">
         <div className="bg-card rounded-2xl shadow-elegant border border-border p-6 md:p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Full name */}
