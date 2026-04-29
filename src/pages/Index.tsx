@@ -299,6 +299,7 @@ const Index = () => {
                   بحث
                 </>
               )}
+            </Button>
           </form>
         </div>
       </main>
