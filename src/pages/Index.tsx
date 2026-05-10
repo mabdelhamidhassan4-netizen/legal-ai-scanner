@@ -160,8 +160,8 @@ const Index = () => {
           <div className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-xl bg-accent mb-2 shadow-gold">
             <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-accent-foreground" />
           </div>
-          <h1 className="text-base md:text-xl font-semibold tracking-tight">
-            <span className="text-accent">legal</span>AI Scanner
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight leading-tight">
+            <span className="text-accent">Legal</span>AI Scanner
           </h1>
         </div>
       </header>
