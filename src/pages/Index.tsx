@@ -156,20 +156,17 @@ const Index = () => {
     <div className="min-h-screen bg-background" dir="rtl">
       {/* Hero header */}
       <header className="gradient-hero text-primary-foreground relative">
-        <div className="max-w-3xl mx-auto px-4 pt-5 pb-8 md:pt-7 md:pb-10 text-center">
-          <div className="inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-accent mb-2 shadow-gold">
-            <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-accent-foreground" />
+        <div className="max-w-3xl mx-auto px-4 pt-4 pb-6 md:pt-5 md:pb-8 text-center">
+          <div className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-xl bg-accent mb-2 shadow-gold">
+            <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-accent-foreground" />
           </div>
-          <h1 className="text-lg md:text-2xl font-extrabold tracking-tight">
+          <h1 className="text-base md:text-xl font-semibold tracking-tight">
             <span className="text-accent">legal</span>AI Scanner
           </h1>
-          <p className="mt-1 text-xs md:text-sm opacity-90 leading-relaxed">
-            فحص العقود والمستندات بالذكاء الاصطناعي
-          </p>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 -mt-4 pb-10">
+      <main className="max-w-2xl mx-auto px-4 -mt-3 pb-10">
         <div className="bg-card rounded-2xl shadow-elegant border border-border p-5 md:p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Full name */}
