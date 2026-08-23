@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useLang } from "@/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // Compound name prefixes that should be treated as a single naming unit
 const COMPOUND_PREFIXES = [
@@ -61,37 +63,8 @@ function countNameUnits(name: string): number {
   return units;
 }
 
-const DOCUMENT_TYPES = [
-  "عقد بيع عقار",
-  "عقد إيجار",
-  "عقد عمل وتوظيف",
-  "عقد مقاولة",
-  "عقد شركة / مشاركة تجارية",
-  "توكيل رسمي / وكالة",
-  "سند / شيك / إقرار مالي",
-  "مستند رسمي آخر",
-];
-
 const MAX_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_TYPES = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
-
-const formSchema = z.object({
-  fullName: z
-    .string()
-    .min(1, "يرجى إدخال الاسم الثلاثي كاملاً")
-    .refine((n) => countNameUnits(n) >= 3, "يرجى إدخال الاسم الثلاثي كاملاً"),
-  email: z
-    .string()
-    .min(1, "يرجى إدخال بريد إلكتروني صحيح")
-    .email("يرجى إدخال بريد إلكتروني صحيح"),
-  documentType: z.string().min(1, "يرجى اختيار نوع المستند"),
-  document: z
-    .instanceof(File, { message: "يرجى تحميل المستند المراد فحصه" })
-    .refine((f) => ACCEPTED_TYPES.includes(f.type), "الصيغة غير مدعومة (PDF, JPG, PNG)")
-    .refine((f) => f.size <= MAX_SIZE, "الحد الأقصى للحجم 10MB"),
-});
-
-type FormData = z.infer<typeof formSchema>;
 
 const fileToBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -108,8 +81,28 @@ const fileToBase64 = (file: File): Promise<string> =>
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t, dir, lang } = useLang();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const formSchema = useMemo(
+    () =>
+      z.object({
+        fullName: z
+          .string()
+          .min(1, t.fullNameError)
+          .refine((n) => countNameUnits(n) >= 3, t.fullNameError),
+        email: z.string().min(1, t.emailError).email(t.emailError),
+        documentType: z.string().min(1, t.documentTypeError),
+        document: z
+          .instanceof(File, { message: t.uploadRequired })
+          .refine((f) => ACCEPTED_TYPES.includes(f.type), t.uploadFormat)
+          .refine((f) => f.size <= MAX_SIZE, t.uploadSize),
+      }),
+    [t],
+  );
+
+  type FormData = z.infer<typeof formSchema>;
 
   const {
     register,
@@ -136,8 +129,8 @@ const Index = () => {
       });
     } catch (e) {
       toast({
-        title: "حدث خطأ",
-        description: "تعذّر تجهيز الملف للتحليل",
+        title: t.prepError,
+        description: t.prepErrorDesc,
         variant: "destructive",
       });
       setSubmitting(false);
@@ -153,39 +146,48 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
-      {/* Hero header */}
-      <header className="gradient-hero text-primary-foreground relative">
-        <div className="max-w-3xl mx-auto px-4 pt-4 pb-6 md:pt-5 md:pb-8 text-center">
-          <div className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-xl bg-accent mb-2 shadow-gold">
-            <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-accent-foreground" />
+    <div className="min-h-screen bg-background" dir={dir}>
+      {/* Header */}
+      <header className="bg-primary text-primary-foreground">
+        <div className="max-w-3xl mx-auto px-4 pt-3 pb-7 md:pt-4 md:pb-9">
+          <div className="flex justify-end">
+            <LanguageSwitcher />
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight leading-tight">
-            <span className="text-accent">Legal</span>AI Scanner
-          </h1>
+          <div className="text-center -mt-6">
+            <div className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-xl bg-accent mb-2">
+              <ShieldCheck className="w-5 h-5 text-accent-foreground" />
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight leading-tight">
+              <span className="text-accent">{t.appName.pre}</span>
+              {t.appName.post}
+            </h1>
+            <p className="mt-1.5 text-xs md:text-sm text-primary-foreground/75 leading-relaxed">
+              {t.tagline}
+            </p>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 -mt-3 pb-10">
-        <div className="bg-card rounded-2xl shadow-elegant border border-border p-5 md:p-8">
+      <main className="max-w-2xl mx-auto px-4 -mt-4 pb-12">
+        <div className="bg-card rounded-2xl shadow-soft border border-border p-5 md:p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Full name */}
             <div className="space-y-1.5">
-              <Label htmlFor="fullName" className="text-sm md:text-base font-bold text-foreground">
-                الاسم الثلاثي *
+              <Label htmlFor="fullName" className="text-sm font-semibold text-foreground">
+                {t.fullName}
               </Label>
               <Input
                 id="fullName"
                 {...register("fullName")}
-                placeholder="مثال: محمد أحمد السيد"
-                className="h-12 md:h-14 text-sm md:text-base"
-                dir="rtl"
+                placeholder={t.fullNamePlaceholder}
+                className="h-12 md:h-13 text-sm md:text-base"
+                dir={dir}
               />
               <p className="text-xs text-muted-foreground leading-relaxed">
-                يرجى إدخال الاسم الأول + اسم الأب + اسم العائلة
+                {t.fullNameHint}
               </p>
               {errors.fullName && (
-                <p className="text-destructive text-xs md:text-sm font-medium">
+                <p className="text-destructive text-xs font-medium">
                   {errors.fullName.message}
                 </p>
               )}
@@ -193,19 +195,19 @@ const Index = () => {
 
             {/* Email */}
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm md:text-base font-bold text-foreground">
-                البريد الإلكتروني *
+              <Label htmlFor="email" className="text-sm font-semibold text-foreground">
+                {t.email}
               </Label>
               <Input
                 id="email"
                 type="email"
                 {...register("email")}
-                placeholder="example@email.com"
-                className="h-12 md:h-14 text-sm md:text-base"
+                placeholder={t.emailPlaceholder}
+                className="h-12 md:h-13 text-sm md:text-base"
                 dir="ltr"
               />
               {errors.email && (
-                <p className="text-destructive text-xs md:text-sm font-medium">
+                <p className="text-destructive text-xs font-medium">
                   {errors.email.message}
                 </p>
               )}
@@ -213,23 +215,26 @@ const Index = () => {
 
             {/* Document type */}
             <div className="space-y-1.5">
-              <Label htmlFor="documentType" className="text-sm md:text-base font-bold text-foreground">
-                نوع المستند *
+              <Label htmlFor="documentType" className="text-sm font-semibold text-foreground">
+                {t.documentType}
               </Label>
-              <Select onValueChange={(v) => setValue("documentType", v, { shouldValidate: true })}>
-                <SelectTrigger className="h-12 md:h-14 text-sm md:text-base bg-background">
-                  <SelectValue placeholder="اختر نوع المستند" />
+              <Select
+                key={lang}
+                onValueChange={(v) => setValue("documentType", v, { shouldValidate: true })}
+              >
+                <SelectTrigger className="h-12 md:h-13 text-sm md:text-base bg-background">
+                  <SelectValue placeholder={t.documentTypePlaceholder} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover">
-                  {DOCUMENT_TYPES.map((t) => (
-                    <SelectItem key={t} value={t} className="text-sm md:text-base">
-                      {t}
+                  {t.docTypes.map((d) => (
+                    <SelectItem key={d} value={d} className="text-sm md:text-base">
+                      {d}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {errors.documentType && (
-                <p className="text-destructive text-xs md:text-sm font-medium">
+                <p className="text-destructive text-xs font-medium">
                   {errors.documentType.message}
                 </p>
               )}
@@ -237,22 +242,22 @@ const Index = () => {
 
             {/* Document upload */}
             <div className="space-y-1.5">
-              <Label htmlFor="document" className="text-sm md:text-base font-bold text-foreground">
-                تحميل المستند *
+              <Label htmlFor="document" className="text-sm font-semibold text-foreground">
+                {t.upload}
               </Label>
               <label
                 htmlFor="document"
                 className="relative flex flex-col items-center justify-center gap-2 p-5 md:p-6 border-2 border-dashed border-border rounded-xl bg-muted/30 hover:bg-muted/60 cursor-pointer transition-colors"
               >
                 <div className="flex items-center gap-3 text-primary">
-                  <Camera className="h-6 w-6 md:h-7 md:w-7" />
-                  <Upload className="h-5 w-5 md:h-6 md:w-6" />
+                  <Camera className="h-6 w-6" />
+                  <Upload className="h-5 w-5" />
                 </div>
-                <p className="text-sm md:text-base font-semibold text-foreground">
-                  اختر ملفاً أو التقط صورة
+                <p className="text-sm font-medium text-foreground text-center">
+                  {t.uploadCta}
                 </p>
                 <p className="text-xs text-muted-foreground text-center leading-relaxed">
-                  PDF, JPG, PNG, JPEG — الحد الأقصى 10MB
+                  {t.uploadHint}
                 </p>
                 <Input
                   id="document"
@@ -264,12 +269,12 @@ const Index = () => {
                 />
               </label>
               {selectedFile && (
-                <p className="text-xs md:text-sm text-success font-medium truncate">
-                  ✓ تم اختيار: {selectedFile.name}
+                <p className="text-xs text-success font-medium truncate">
+                  ✓ {t.uploadSelected}: {selectedFile.name}
                 </p>
               )}
               {errors.document && (
-                <p className="text-destructive text-xs md:text-sm font-medium">
+                <p className="text-destructive text-xs font-medium">
                   {errors.document.message as string}
                 </p>
               )}
@@ -279,18 +284,18 @@ const Index = () => {
             <Button
               type="submit"
               disabled={submitting}
-              className="w-full h-14 md:h-16 text-base md:text-lg font-bold gradient-primary hover:opacity-95 shadow-elegant"
+              className="w-full h-13 md:h-14 text-base font-semibold"
               size="lg"
             >
               {submitting ? (
                 <>
-                  <ScanLine className="ml-2 h-5 w-5 animate-pulse" />
-                  جارٍ التجهيز...
+                  <ScanLine className="me-2 h-5 w-5 animate-pulse" />
+                  {t.submitting}
                 </>
               ) : (
                 <>
-                  <Search className="ml-2 h-5 w-5" />
-                  بحث
+                  <Search className="me-2 h-5 w-5" />
+                  {t.submit}
                 </>
               )}
             </Button>
