@@ -180,7 +180,7 @@ const Index = () => {
                 id="fullName"
                 {...register("fullName")}
                 placeholder={t.fullNamePlaceholder}
-                className="h-12 md:h-13 text-sm md:text-base"
+                className="h-12 md:h-14 text-sm md:text-base"
                 dir={dir}
               />
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -203,7 +203,7 @@ const Index = () => {
                 type="email"
                 {...register("email")}
                 placeholder={t.emailPlaceholder}
-                className="h-12 md:h-13 text-sm md:text-base"
+                className="h-12 md:h-14 text-sm md:text-base"
                 dir="ltr"
               />
               {errors.email && (
@@ -222,7 +222,7 @@ const Index = () => {
                 key={lang}
                 onValueChange={(v) => setValue("documentType", v, { shouldValidate: true })}
               >
-                <SelectTrigger className="h-12 md:h-13 text-sm md:text-base bg-background">
+                <SelectTrigger className="h-12 md:h-14 text-sm md:text-base bg-background">
                   <SelectValue placeholder={t.documentTypePlaceholder} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover">
@@ -284,7 +284,7 @@ const Index = () => {
             <Button
               type="submit"
               disabled={submitting}
-              className="w-full h-13 md:h-14 text-base font-semibold"
+              className="w-full h-14 text-base font-semibold"
               size="lg"
             >
               {submitting ? (
