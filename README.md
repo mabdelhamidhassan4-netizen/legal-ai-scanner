@@ -1,99 +1,57 @@
-# Legal AI Scanner 
-
-Build an MVP app with only two screens.
-This app is a simple AI document-forgery checker.
-Keep the UI extremely clean, simple, and suitable for non-technical users.
-Use a modern professional look with clear spacing and large inputs.
-
-
----
-
-Screen 1 — Document Scan Form
-
-Create a full-screen form with the following fields in this exact order:
-
-1. Full Name – required text input
-
-
-2. Email – required email input
-
-
-3. Document Type – required dropdown (options: Contract, Document, Cheque)
-
-
-4. Upload Document – required file/image upload field with a camera icon 📷 next to it
-
-
-
-Add validation: no field can be left empty.
-
-At the bottom add a large primary button:
-
-[🔍 Scan]
-
-When the user clicks Scan → navigate to Screen 2.
-
-This button will later call an external API (AWS Textract + Comprehend),
-so add a clear placeholder text:
-“AI analysis will run here via external API.”
-
-
----
-
-Screen 2 — ResultAnalysis
-
-This page shows the analysis result of the uploaded document.
-Add a simple, clean layout with these sections:
-
-Document Summary
-
-Extracted Text (preview)
-
-Suspicious Areas / Forgery Indicators
-
-Final AI Decision
-
-
-All sections should have placeholder boxes so I can integrate JSON output from my API later.
-
-Add a “Back to Scan Page” link or button.
-
-
----
-
-Extra Requirements
-
-Do not add login/signup (not needed for MVP).
-
-Keep the navigation minimal (only two screens).
-
-Design for mobile-first layout.
-
-Use a professional blue/white UI theme.
-
-Make the interface ready for an API integration.
-
-App name: Legal AI Scanner
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://legal-ai-scanner.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/6b7356c7-c13c-4069-99bf-d53d0148f19e).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
+Legal AI Scanner
+AI-Powered Contract & Document Analysis
+Legal AI Scanner is an AI-powered application designed to help users perform an initial analysis of contracts and documents under Egyptian law.
+The application extracts information and text from an uploaded document and presents potential issues, missing clauses, suspicious indicators and areas that may require further review.
+Current Stage
+Working MVP
+The current version focuses on the core document-analysis workflow and provides a simple mobile-friendly interface for non-technical users.
+How It Works
+1. The user enters their basic information.
+2. The user selects the document type.
+3. The user uploads a document or document image.
+4. The application processes the submitted document.
+5. The application presents the extracted information and analysis results.
+6. Potential issues missing requirements and indicators that may require further review are displayed.
+Supported Document Types
+Contract
+ Document
+Cheque
+Key Features
+ Document and image upload
+ Document information extraction
+ Extracted text preview
+Initial document analysis
+Identification of potential issues and missing clauses
+Identification of indicators that may require further review
+Simple two-screen user experience
+-Mobile-first interface
+-Clear and accessible design for nont echnical users
+Responsible Use
+Legal AI Scanner provides initial AI-assisted analysis and is not a substitute for a qualified lawyer legal professional forensic expert or official document verification process.
+The application does not independently establish that a document is forged. Its purpose is to identify potential issues inconsistencies missing information or indicators that may warrant further examination.
+Users should obtain appropriate professional or official verification before making legal or financial decisions based on the results.
+Technology
+The application is built as a modern web application using:
+TypeScript
+React
+Vite
+Tailwind CSS
+shadcn/ui
+Project Structure
+The repository contains the source code and configuration required to develop and run the application.
+Development
+Requirements
+Node.js
+ npm
+Installation
 git clone <this-repository-url>
-cd <repository-name>
-npm i
+cd legal-ai-scanner
+npm install
 npm run dev
-```
+The application will then be available through the local development server.
+Live Application
+https://legal-ai-scanner.lovable.app/
+Project Purpose
+Legal AI Scanner is being developed as an early-stage LegalTech solution for initial contract and document analysis in Egypt with the goal of helping individuals and small businesses identify potential document issues earlier and reduce the time and effort required for preliminary review.
+Legal AI Scanner
+AI-Powered Contract & Document Analysis
